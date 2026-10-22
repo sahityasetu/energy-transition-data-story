@@ -1,4 +1,4 @@
-# The Energy Transition in 7 Charts: An Interactive Data Story
+# The Energy Transition in 13 Charts: An Interactive Data Story
 
 **Live page: [sahityasetu.github.io/energy-transition-data-story](https://sahityasetu.github.io/energy-transition-data-story/)**
 
@@ -20,7 +20,8 @@ Solar and wind went from 4% to 15% of the world's electricity between 2014 and 2
 1. **Low-carbon sources covered about 68% of the world's new electricity demand.** The other 32% still came from fossil fuels, so fossil generation kept rising.
 2. **The 36 large power systems (100+ TWh) split into two groups.** 16 burn less fossil fuel for power than in 2014 (UK -53%, Brazil -45%, Germany -43%). 20 burn more.
 3. **Demand growth explains the split.** Countries that cut fossil power grew total generation by a median of 8%; countries where fossil power rose grew by 41%. Correlation between demand growth and fossil change: 0.90.
-4. **India:** generation grew 62%. Solar rose from 5 to 143 TWh, but low-carbon sources met only about 29% of the new demand, so fossil generation still rose 54%. Coal's share is unchanged at about 75%.
+4. **Solar output grew 11x and wind 3.6x** in ten years. China and India now produce 70% of the world's coal power (54% in 2014).
+5. **India:** generation grew 62%. Solar rose from 5 to 143 TWh, but low-carbon sources met only about 29% of the new demand, so fossil generation still rose 54%. Coal's share is unchanged at about 75%.
 
 Every number in the story text is computed in code from the data ([`reports/facts.json`](reports/facts.json)), so nothing is typed in by hand and the page updates when the source data updates.
 
@@ -35,8 +36,16 @@ Every number in the story text is computed in code from the data ([`reports/fact
 | 5 | Low-carbon share map (choropleth) | geography, one-hue scale |
 | 6 | India spotlight (100% stacked area) | how the mix shifted, not just the size |
 | 7 | Explore any country (dropdown) | lets readers check their own country |
+| 8 | World solar and wind output (line) | growth over time, direct end labels |
+| 9 | Coal power by country (stacked area) | concentration: China + India now 70% of coal power |
+| 10 | Solar share leaders (bar, India highlighted) | ranking with one highlighted entity |
+| 11 | Carbon intensity, 8 countries (small multiples) | compare trends without a spaghetti chart |
+| 12 | Low-carbon share, 20 countries x 25 years (heatmap) | many series over time in one view |
+| 13 | Electricity per person vs low-carbon share (log scatter) | income/consumption vs clean grid |
 
 ![World mix](reports/figures/world_mix.png)
+![Carbon intensity](reports/figures/intensity.png)
+![Heatmap](reports/figures/heatmap.png)
 ![Fossil change](reports/figures/fossil_change.png)
 
 ## Design choices

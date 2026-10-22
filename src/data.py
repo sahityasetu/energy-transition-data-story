@@ -59,6 +59,8 @@ def change_table(df: pd.DataFrame, start: int = 2014, end: int = LAST_YEAR, min_
         "solar_wind_share_start": a["solar_share_elec"] + a["wind_share_elec"],
         "solar_wind_share_end": b["solar_share_elec"] + b["wind_share_elec"],
         "low_carbon_share_end": b["low_carbon_share_elec"],
+        "solar_share": b["solar_share_elec"],
+        "per_capita_kwh": b["per_capita_electricity"],
     }).dropna()
     t["demand_growth_pct"] = (t["generation_end"] / t["generation_start"] - 1) * 100
     t["fossil_change_pct"] = (t["fossil_end"] / t["fossil_start"] - 1) * 100
@@ -67,6 +69,12 @@ def change_table(df: pd.DataFrame, start: int = 2014, end: int = LAST_YEAR, min_
     growth = t["generation_end"] - t["generation_start"]
     t["clean_share_of_growth_pct"] = ((t["low_carbon_end"] - t["low_carbon_start"]) / growth * 100).where(growth > 0)
     return t.sort_values("fossil_change_pct")
+
+
+def pivot(df: pd.DataFrame, col: str, names: list, start: int = 2000) -> pd.DataFrame:
+    """year x country table of one column."""
+    part = df[df["country"].isin(names) & (df["year"] >= start)]
+    return part.pivot(index="year", columns="country", values=col)[names]
 
 
 def world_kpis(df: pd.DataFrame, start: int = 2014, end: int = LAST_YEAR) -> dict:

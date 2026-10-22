@@ -3,6 +3,7 @@
 Colors: source colors were checked for colour-blind separation (adjacent pairs in stack order).
 Three of them are light on a white background, so every stacked chart also carries direct labels.
 """
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
@@ -174,3 +175,108 @@ def country_mix_share(m: pd.DataFrame, country: str) -> go.Figure:
     fig.update_yaxes(ticksuffix="%", range=[0, 100])
     return style(fig, f"{country}: coal still supplies most of the power",
                  f"Share of {country}'s electricity by source, %", height=460)
+
+
+def solar_wind_growth(w: pd.DataFrame, start: int) -> go.Figure:
+    """World solar and wind generation, TWh. w: World rows indexed by year."""
+    fig = go.Figure()
+    for col, name in [("wind_electricity", "Wind"), ("solar_electricity", "Solar")]:
+        s = w[col].loc[2005:]
+        fig.add_trace(go.Scatter(x=s.index, y=s, name=name, mode="lines", line=dict(color=SOURCE_COLORS[name], width=2.5),
+                                 hovertemplate=f"<b>{name}</b> %{{x}}: %{{y:,.0f}} TWh<extra></extra>"))
+        end = s.index[-1]
+        fig.add_annotation(x=end, y=s.iloc[-1], text=f"{name} x{s.iloc[-1] / s.loc[start]:.0f} since {start}",
+                           xanchor="left", xshift=6, showarrow=False, font=dict(size=11, color=INK_2))
+    fig.update_yaxes(title="TWh")
+    fig.update_xaxes(range=[2005, w.index[-1] + 6])
+    return style(fig, "Solar output grew more than tenfold in ten years",
+                 "World generation from solar and wind, TWh", height=440)
+
+
+def coal_concentration(df: pd.DataFrame, top: list) -> go.Figure:
+    """Coal generation stacked by the largest coal users + rest of world. df: pivot year x country (incl. 'World')."""
+    colors = [BLUE, "#eb6834", "#1baf7a", "#eda100"]
+    rest = df["World"] - df[top].sum(axis=1)
+    fig = go.Figure()
+    for name, series, color in [*zip(top, [df[c] for c in top], colors), ("Rest of world", rest, colors[len(top)])]:
+        fig.add_trace(go.Scatter(x=series.index, y=series, name=name, stackgroup="one", mode="lines",
+                                 line=dict(width=0.5, color=SURFACE), fillcolor=color,
+                                 hovertemplate=f"<b>{name}</b> %{{x}}: %{{y:,.0f}} TWh<extra></extra>"))
+    fig.update_yaxes(title="TWh")
+    return style(fig, "Coal power is now mostly a China and India story",
+                 "Electricity from coal by country, TWh, 2000-2024", height=460)
+
+
+def carbon_intensity_grid(series: dict, world: pd.Series) -> go.Figure:
+    """Small multiples: one panel per country, country in blue, world average in grey for reference."""
+    from plotly.subplots import make_subplots
+    names = list(series)
+    cols = 4
+    rows = (len(names) + cols - 1) // cols
+    fig = make_subplots(rows=rows, cols=cols, subplot_titles=names, shared_yaxes=True,
+                        horizontal_spacing=0.03, vertical_spacing=0.14)
+    for i, name in enumerate(names):
+        r, c = i // cols + 1, i % cols + 1
+        fig.add_trace(go.Scatter(x=world.index, y=world, mode="lines", line=dict(color=AXIS, width=1.5, dash="dot"),
+                                 name="World", showlegend=i == 0, hovertemplate="World %{x}: %{y:.0f} g<extra></extra>"),
+                      row=r, col=c)
+        s = series[name]
+        fig.add_trace(go.Scatter(x=s.index, y=s, mode="lines", line=dict(color=BLUE, width=2.5), name=name,
+                                 showlegend=False, hovertemplate=f"<b>{name}</b> %{{x}}: %{{y:.0f}} gCO₂/kWh<extra></extra>"),
+                      row=r, col=c)
+    fig.update_annotations(font=dict(size=12, color=INK))
+    fig.update_yaxes(range=[0, 900])
+    fig.update_layout(legend=dict(x=1, xanchor="right", y=1.06))
+    fig.update_xaxes(dtick=10)
+    return style(fig, "How dirty is each kWh? Carbon intensity of electricity",
+                 "Grams of CO₂ per kWh generated, 2000-2024. Blue = country, dotted grey = world average.",
+                 height=560)
+
+
+def low_carbon_heatmap(h: pd.DataFrame) -> go.Figure:
+    """h: countries (rows, sorted) x years, low-carbon share %."""
+    fig = go.Figure(go.Heatmap(
+        z=h.values, x=h.columns, y=h.index, zmin=0, zmax=100, xgap=1, ygap=1,
+        colorscale=[[i / (len(BLUES) - 1), b] for i, b in enumerate(BLUES)],
+        colorbar=dict(title="Low-carbon<br>share", ticksuffix="%", thickness=12, len=0.6),
+        hovertemplate="<b>%{y}</b> %{x}: %{z:.0f}% low-carbon<extra></extra>"))
+    fig.update_yaxes(autorange="reversed", gridcolor="rgba(0,0,0,0)", tickfont=dict(color=INK_2))
+    fig.update_xaxes(gridcolor="rgba(0,0,0,0)", dtick=4)
+    return style(fig, "25 years of change at a glance",
+                 "Low-carbon share of electricity for the 20 largest power systems, sorted by 2024 value",
+                 height=620)
+
+
+def per_capita_scatter(t: pd.DataFrame, labels: list, year: int) -> go.Figure:
+    fig = go.Figure(go.Scatter(
+        x=t["per_capita_kwh"], y=t["low_carbon_share_end"], mode="markers", hovertext=t.index,
+        marker=dict(size=(t["generation_end"] ** 0.5) / 2.2 + 6, color=BLUE, opacity=0.75,
+                    line=dict(width=2, color=SURFACE)),
+        hovertemplate="<b>%{hovertext}</b><br>%{x:,.0f} kWh per person<br>%{y:.0f}% low-carbon<extra></extra>"))
+    for c in labels:
+        if c in t.index:
+            fig.add_annotation(x=np.log10(t.loc[c, "per_capita_kwh"]), y=t.loc[c, "low_carbon_share_end"], text=c,
+                               ax=0, ay=-28, showarrow=True, arrowhead=0, arrowwidth=1, arrowcolor=MUTED,
+                               font=dict(size=11, color=INK_2), bgcolor="rgba(252,252,251,0.8)")
+    ticks = [500, 1000, 2000, 5000, 10000, 20000, 30000]
+    fig.update_xaxes(type="log", tickvals=ticks, ticktext=[f"{v:,}" for v in ticks],
+                     title=f"Electricity generated per person, kWh, {year} (log scale)")
+    fig.update_yaxes(ticksuffix="%", title="Low-carbon share", range=[0, 105])
+    return style(fig, "Low-carbon shares vary at every level of consumption",
+                 f"Countries generating 100+ TWh, {year}. Bubble size = total generation.", height=520)
+
+
+def solar_leaders(t: pd.DataFrame, highlight: str, top: int = 15) -> go.Figure:
+    s = t.nlargest(top, "solar_share")
+    if highlight not in s.index:
+        s = pd.concat([s.iloc[:top - 1], t.loc[[highlight]]])
+    s = s.sort_values("solar_share")
+    colors = [BLUE if c == highlight else "#9ec5f4" for c in s.index]
+    fig = go.Figure(go.Bar(x=s["solar_share"], y=s.index, orientation="h", marker=dict(color=colors),
+                           text=[f"{v:.1f}%" for v in s["solar_share"]], textposition="outside",
+                           textfont=dict(color=INK_2, size=11),
+                           hovertemplate="<b>%{y}</b>: %{x:.1f}% of electricity from solar<extra></extra>"))
+    fig.update_xaxes(ticksuffix="%", title="Solar share of electricity")
+    fig.update_yaxes(gridcolor="rgba(0,0,0,0)", tickfont=dict(color=INK_2))
+    return style(fig, "Who gets the most power from the sun?",
+                 f"Solar share of electricity, large power systems (100+ TWh), {highlight} highlighted", height=520)

@@ -1,4 +1,23 @@
 {
+  "solar_x": 10.835693334681906,
+  "wind_x": 3.5540291743379124,
+  "solar_twh": 2142.65,
+  "wind_twh": 2509.5,
+  "china_india_coal_share": 69.69866039658638,
+  "china_india_coal_share_start": 53.65551695988272,
+  "rest_coal_change": -11.427117533476894,
+  "ci_uk": [
+    462.88,
+    216.5
+  ],
+  "ci_india": 705.4,
+  "ci_world": 471.08,
+  "pc_india": 1403.591,
+  "pc_world": 3789.553,
+  "pc_us": 12711.877,
+  "solar_top": "Spain",
+  "solar_top_share": 20.748,
+  "solar_rank_spot": 16,
   "world": {
     "low_carbon_share": [
       32.785,

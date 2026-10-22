@@ -14,7 +14,8 @@ def toy():
         for year, g, f, lc in zip((2014, 2024), gen, fossil, low):
             row = {"country": country, "iso_code": iso, "year": year, "electricity_generation": g,
                    "fossil_electricity": f, "low_carbon_electricity": lc, "solar_share_elec": lc / g * 50,
-                   "wind_share_elec": lc / g * 50, "low_carbon_share_elec": lc / g * 100}
+                   "wind_share_elec": lc / g * 50, "low_carbon_share_elec": lc / g * 100,
+                   "per_capita_electricity": g * 10}
             row.update({f"{s}_electricity": g / len(SOURCES) for s in SOURCES})
             rows.append(row)
     return pd.DataFrame(rows)
