@@ -1,0 +1,50 @@
+{
+  "world": {
+    "low_carbon_share": [
+      32.785,
+      40.914
+    ],
+    "solar_wind_share": [
+      3.806,
+      15.04
+    ],
+    "coal_share": [
+      40.442,
+      34.073
+    ],
+    "carbon_intensity": [
+      544.73,
+      471.08
+    ],
+    "generation": [
+      23747.07,
+      30930.23
+    ],
+    "fossil": [
+      15961.62,
+      18275.51
+    ]
+  },
+  "world_clean_share_of_growth": 67.78729695565744,
+  "n_countries": 36,
+  "n_fell": 16,
+  "n_rose": 20,
+  "fell_median_demand": 7.949150869377453,
+  "rose_median_demand": 41.11233350590522,
+  "corr_demand_fossil": 0.9009731734350429,
+  "biggest_cut": "United Kingdom",
+  "biggest_cut_pct": -52.50691068534934,
+  "top_solar_wind": "Netherlands",
+  "top_solar_wind_gain": 38.81,
+  "spot": {
+    "demand_growth": 61.798074172943075,
+    "fossil_change": 53.91958965957737,
+    "clean_share_of_growth": 28.913401213617195,
+    "coal_share_start": 75.47033400069913,
+    "coal_share_end": 74.53400899573784,
+    "solar_share_start": 0.3900912066609463,
+    "solar_share_end": 7.025219492074715,
+    "solar_twh_start": 4.91,
+    "solar_twh_end": 143.07
+  }
+}
